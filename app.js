@@ -5,8 +5,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var mongoose = require('mongoose');
+var passport = require('passport');
 
-mongoose.connect('mongodb://localhost/todo', { useNewUrlParser: true })
+require('dotenv').config();
+
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true })
         .then(() => {
           console.log('MONGODB CONNECTED');
         })
@@ -23,6 +26,10 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.use(passport.initialize());
+
+require('./passport/passport')(passport);
 
 app.use(cors());
 app.use(logger('dev'));

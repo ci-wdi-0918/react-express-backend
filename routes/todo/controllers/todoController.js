@@ -1,4 +1,5 @@
 const Todo = require('../model/Todo');
+const User = require('../../users/model/User');
 
 module.exports = {
 
@@ -19,13 +20,39 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
 
-            Todo.create(params)
-                .then( todo => {
-                    resolve(todo);
+          
+            User.findById(params.id)
+                .then(user => {
+
+                    let newTodo = new Todo({
+                        todo: params.todo,
+                        user_id: user.id
+                    });
+
+                    newTodo
+                        .save()
+                        .then( savedTodo => {
+
+                            user.todos.push(savedTodo);
+
+                            user.save()
+                                .then( () => {
+                                    resolve(savedTodo);
+                                })
+                                .catch(error => {
+                                    reject(error);
+                                })
+
+                        })
+                        .catch(error => {
+                            reject(error);
+                        })
+
                 })
                 .catch( error => {
                     reject(error);
                 })
+
 
 
         });
