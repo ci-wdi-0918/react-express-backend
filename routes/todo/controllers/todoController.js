@@ -3,17 +3,22 @@ const User = require('../../users/model/User');
 
 module.exports = {
 
-    getAllTodos: (params) => {
+    getAllTodos: (id) => {
 
         return new Promise((resolve, reject) => {
 
-            Todo.find(params)
-                .then( todos => {
-                    resolve(todos);
-                })
-                .catch( error => {
-                    reject(error);
-                })
+            User.findById({_id: id}, 'todos email username')
+                .populate('todos', '-user_id -__v')
+                .exec((err, user) => {
+
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(user)
+                    }
+
+                });
+
         });
     },
     createTodo: (params) => {

@@ -6,7 +6,9 @@ var todoController = require('./controllers/todoController');
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
-  todoController.getAllTodos({})
+  const id = req.query.id;
+
+  todoController.getAllTodos(id)
                 .then( todos => {
                   console.log(todos)
                   res.json(todos);
