@@ -83,18 +83,55 @@ module.exports = {
     },
 
 
-    deleteTodoByID: (id) => {
+    deleteTodoByID: (userID ,id) => {
 
 
         return new Promise((resolve, reject) => {
 
-            Todo.findByIdAndDelete(id)
-                .then( deleted => {
-                    resolve(deleted);
+            User.findById(userID)
+                .then( user => {
+
+                    let filteredArray = user.todos.filter( e => e.toString() !== id);
+
+                    user.todos = filteredArray;
+
+                    user.save()
+                        .then( user => {
+
+                            Todo.findByIdAndDelete(id)
+                                .then( deleted => {
+
+                                    
+                                    User.findById({_id: userID}, 'todos')
+                                        .populate('todos', '-user_id -__v')
+                                        .exec((err, user) => {
+                                            if (err) {
+                                                reject(err)
+                                            } else {
+                                                resolve(user);
+                                            }
+                                        })
+
+
+
+                                })
+                                .catch( error => {
+                                    reject(error);
+                                })
+
+
+                        })
+                        .catch( error => {
+                            reject(error);
+                        })
+                    
                 })
                 .catch( error => {
                     reject(error);
                 })
+
+
+      
 
 
 

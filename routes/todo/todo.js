@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var passport = require('passport')
 
 var todoController = require('./controllers/todoController');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', passport.authenticate('jwt', {session: false }), function(req, res, next) {
   
   const id = req.query.id;
 
@@ -19,7 +20,7 @@ router.get('/', function(req, res, next) {
 
 });
 
-router.post('/createtodo', function(req, res, next) {
+router.post('/createtodo', passport.authenticate('jwt', {session: false }), function(req, res, next) {
 
     todoController.createTodo(req.body)
                   .then( todo => {
@@ -31,7 +32,7 @@ router.post('/createtodo', function(req, res, next) {
 
 })
 
-router.put('/updatetodobyid', function(req, res) {
+router.put('/updatetodobyid', passport.authenticate('jwt', {session: false }), function(req, res) {
 
   let id = req.body.id;
   let newTodo = req.body.newTodo
@@ -49,12 +50,13 @@ router.put('/updatetodobyid', function(req, res) {
 
 });
 
-router.delete('/deletetodobyid',function(req, res) {
+router.delete('/deletetodobyid/:userid/:id', passport.authenticate('jwt', {session: false }), function(req, res) {
   
-  //let id = req.body.id;
-  let id = req.query.id;
+  let id = req.params.id;
+  let userID = req.params.userid;
+  //let id = req.query.id;
 
-  todoController.deleteTodoByID(id)
+  todoController.deleteTodoByID(userID,id)
                 .then( deleted => {
                   res.json(deleted)
                 })
